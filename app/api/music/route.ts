@@ -1,3 +1,4 @@
+import { checkApiLimit, increaseApiLimit } from "@/lib/apiLimit";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Replicate from "replicate"
@@ -16,6 +17,13 @@ export async function POST(req: Request) {
         }
         if (!prompt) {
             return NextResponse.json({ error: "prompt required" }, { status: 400 })
+        }
+
+        const freeTrial = await checkApiLimit();
+        await increaseApiLimit();
+
+        if (!freeTrial) {
+            return NextResponse.json({ error: "free trial limit exceeded" }, { status: 403 })
         }
 
         const input = {

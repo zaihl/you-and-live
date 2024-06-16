@@ -1,6 +1,8 @@
 "use server"
 
+import { checkApiLimit, increaseApiLimit } from "@/lib/apiLimit";
 import { auth } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 export async function generateImage({prompt, style, resolution}: {prompt: string, style: string, resolution: string}) {
     try {
@@ -11,7 +13,12 @@ export async function generateImage({prompt, style, resolution}: {prompt: string
         if (!prompt) {
             throw new Error("prompt required")
         }
-        console.log("here in generateImage")
+        const freeTrial = await checkApiLimit();
+        await increaseApiLimit();
+
+        if (!freeTrial) {
+            return NextResponse.json({ error: "free trial limit exceeded" }, { status: 403 })
+        }
         const size = resolution.slice(0, 4)
         const options = {
             method: 'POST',
@@ -28,10 +35,8 @@ export async function generateImage({prompt, style, resolution}: {prompt: string
                 output_format: 'png'
             })
         }; 
-        console.log("here before fetch")
         const res = await fetch('https://api.getimg.ai/v1/essential/text-to-image', options)
         const { image } = await res.json()
-        console.log("here after fetch")
         return `data:image/png;base64,${image}`
     } catch (error: any) {
         throw new Error(error)
