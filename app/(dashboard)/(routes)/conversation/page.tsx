@@ -119,7 +119,7 @@ const ConversationPage = () => {
             </div>
           )}
           <div
-            className="flex flex-col-reverse gap-y-4 w-full"
+            className="p-2 flex flex-col-reverse gap-y-4 w-full"
           >
             {messages.map((message, index) => (
               <div

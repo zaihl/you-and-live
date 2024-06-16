@@ -50,6 +50,9 @@ const ImagePage = () => {
     try {
       console.log("here")
       const src = await generateImage(values);
+      if (typeof src === "object") {
+        throw new Error("Failed to generate image");
+      }
       setImages([...images, src]);
       setPrompts([...prompts, values.prompt])
     } catch (error: any) {
