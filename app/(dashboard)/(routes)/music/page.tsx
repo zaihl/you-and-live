@@ -18,11 +18,12 @@ import { User } from "lucide-react";
 import { Empty } from "./empty";
 import Loader from "@/components/custom/Loader";
 import ReactMarkdown from "react-markdown";
+import { useProModal } from "@/hooks/useProModal";
 
 
 const MusicPage = () => {
   const router = useRouter();
-  
+  const proModal = useProModal()
   const [musicHistory, setMusicHistory] = useState<string[]>([]);
   const [promptHistory, setPromptHistory] = useState<string[]>([]);
 
@@ -51,7 +52,9 @@ const MusicPage = () => {
 
       form.reset();
     } catch (error: any) {
-      // TODO: Open Pro Modal
+      if (error?.response?.status === 403) {
+        proModal.onOpen();
+      }
       console.log(error);
     } finally {
       router.refresh();

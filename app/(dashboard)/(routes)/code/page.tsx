@@ -18,6 +18,7 @@ import { User } from "lucide-react";
 import { Empty } from "./empty";
 import Loader from "@/components/custom/Loader";
 import ReactMarkdown from "react-markdown"
+import { useProModal } from "@/hooks/useProModal";
 
 interface geminiChat {
   role: "user" | "model";
@@ -25,6 +26,7 @@ interface geminiChat {
 }
 
 const CodePage = () => {
+  const proModal = useProModal()
   const router = useRouter();
   const [messages, setMessages] = useState<geminiChat[]>([]);
 
@@ -59,7 +61,9 @@ const CodePage = () => {
 
       form.reset();
     } catch (error: any) {
-      // TODO: Open Pro Modal
+      if (error?.response?.status === 403) {
+        proModal.onOpen();
+      }
       console.log(error);
     } finally {
       router.refresh();

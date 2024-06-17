@@ -20,10 +20,12 @@ import Loader from "@/components/custom/Loader";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Image from "next/image";
 import { generateImage } from "./action";
+import { useProModal } from "@/hooks/useProModal";
 
 
 const ImagePage = () => {
 
+  const proModal = useProModal()
   const [prompts, setPrompts] = useState<string[]>([]);
   const [images, setImages] = useState<string[]>([]);
 
@@ -56,7 +58,9 @@ const ImagePage = () => {
       setImages([...images, src]);
       setPrompts([...prompts, values.prompt])
     } catch (error: any) {
-      // TODO: Open Pro Modal
+      if (error?.response?.status === 403) {
+        proModal.onOpen();
+      }
       console.log(error);
     } finally {
       router.refresh();
