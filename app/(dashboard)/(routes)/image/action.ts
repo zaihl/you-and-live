@@ -14,11 +14,13 @@ export async function generateImage({prompt, style, resolution}: {prompt: string
             throw new Error("prompt required")
         }
         const freeTrial = await checkApiLimit();
-        await increaseApiLimit();
 
         if (!freeTrial) {
             return NextResponse.json({ error: "free trial limit exceeded" }, { status: 403 })
         }
+        
+        await increaseApiLimit();
+
         const size = resolution.slice(0, 4)
         const options = {
             method: 'POST',

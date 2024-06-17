@@ -20,11 +20,11 @@ export async function POST(req: Request) {
         }
 
         const freeTrial = await checkApiLimit();
-        await increaseApiLimit();
-
         if (!freeTrial) {
             return NextResponse.json({ error: "free trial limit exceeded" }, { status: 403 })
         }
+        await increaseApiLimit();
+
 
         const input = {
             prompt_b: prompt

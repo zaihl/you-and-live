@@ -3,6 +3,9 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { LandingNavbar } from '@/components/custom/LandingNavbar'
+import { LandingContent } from "@/components/custom/LandingContent";
+import LandingHero from '@/components/custom/LandingHero'
 
 const LandingPage = () => {
   const { userId } = auth();
@@ -12,19 +15,9 @@ const LandingPage = () => {
   }
   return (
     <div>
-      Landing Page (unprotected)
-      <div>
-        <Link href="/sign-in">
-          <Button>
-            Sign in
-          </Button>
-        </Link>
-        <Link href="/sign-up">
-          <Button>
-            Sign up
-          </Button>
-        </Link>
-      </div>
+      <LandingNavbar />
+      <LandingHero />
+      <LandingContent />
     </div>
   )
 }

@@ -18,11 +18,11 @@ export async function POST(req: Request) {
         }
 
         const freeTrial = await checkApiLimit();
-        await increaseApiLimit();
-
         if (!freeTrial) {
             return NextResponse.json({error: "free trial limit exceeded"}, {status: 403})
         }
+        await increaseApiLimit();
+
         
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
