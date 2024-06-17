@@ -33,6 +33,8 @@ export const metadata = {
   },
   openGraph: {
     images: '/og-image.png',
+    url: 'https://www.you-and.live',
+    siteName: 'you-and.live',
   },
 };
 
