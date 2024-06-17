@@ -52,7 +52,6 @@ const ConversationPage = () => {
       const response = await axios.post("/api/conversation", {
         messages: newMessages,
       });
-
       const modelResponse: geminiChat = {
         role: "model",
         parts: [{ text: response.data.text }],

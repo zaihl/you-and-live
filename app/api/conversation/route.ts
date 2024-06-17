@@ -9,7 +9,6 @@ export async function POST(req: Request) {
     try {
         const { messages } = await req.json();
         const {userId} = auth()
-
         if (!userId) {
             return NextResponse.json({error: "user unauthorized"}, {status: 401})
         }
@@ -37,7 +36,6 @@ export async function POST(req: Request) {
         const result = await chat.sendMessage(prompt);
         const response = await result.response;
         const text = await response.text();
-        console.log(text);
         return NextResponse.json({ text });
     } catch (error) {
         return NextResponse.json({ text: error })
