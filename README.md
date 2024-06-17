@@ -62,6 +62,10 @@ Our platform is built on a cutting-edge tech stack:
 
 ### <span style="color:#007bff;">TODO List for You-and-Live Website</span>
 
+#### Primary objectives
+- [ ] Add more utilites
+- [ ] Add image and video editing utilities
+
 #### Feature Enhancements
 
 - [ ] Implement real-time chat features in the chatbot utility.
