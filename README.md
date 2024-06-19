@@ -65,6 +65,7 @@ Our platform is built on a cutting-edge tech stack:
 - **UI Components:** shadcn-ui & lucid-react
 - **API Requests:** Axios
 - **API Rate Limiting:** Prisma
+- **Database:** Supabase
 - **Type Validation:** Zod
 - **Styling:** Tailwind CSS
 
