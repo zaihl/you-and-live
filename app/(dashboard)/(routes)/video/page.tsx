@@ -55,7 +55,7 @@ const VideoPage = () => {
       if (error?.response?.status === 403) {
         proModal.onOpen();
       }
-      console.log(error);
+      console.error(error);
     } finally {
       router.refresh();
     }
