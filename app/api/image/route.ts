@@ -1,27 +1,30 @@
-"use server"
-
 import { checkApiLimit, increaseApiLimit } from "@/lib/apiLimit";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function generateImage({prompt, style, resolution}: {prompt: string, style: string, resolution: string}) {
+export async function POST(req: Request) {
     try {
-        const { userId } = auth()
+        const { userId } = auth();
         if (!userId) {
-            throw new Error("user unauthorized")
+            return new NextResponse("Unauthorized", { status: 401 });
         }
+
+        const body = await req.json();
+        const { prompt, style, resolution } = body;
+
         if (!prompt) {
-            throw new Error("prompt required")
+            return new NextResponse("Prompt is required", { status: 400 });
         }
+
         const freeTrial = await checkApiLimit();
 
         if (!freeTrial) {
-            return NextResponse.json({ error: "free trial limit exceeded" }, { status: 403 })
+            return new NextResponse("Free trial limit exceeded", { status: 403 });
         }
-        
+
         await increaseApiLimit();
 
-        const size = resolution.slice(0, 4)
+        const size = resolution.slice(0, 4);
         const options = {
             method: 'POST',
             headers: {
@@ -36,11 +39,16 @@ export async function generateImage({prompt, style, resolution}: {prompt: string
                 height: size,
                 output_format: 'png'
             })
-        }; 
-        const res = await fetch('https://api.getimg.ai/v1/essential/text-to-image', options)
-        const { image } = await res.json()
-        return `data:image/png;base64,${image}`
-    } catch (error: any) {
-        throw new Error(error)
+        };
+
+        const res = await fetch('https://api.getimg.ai/v1/essential/text-to-image', options);
+        const { image } = await res.json();
+        const src = `data:image/png;base64,${image}`;
+
+        return NextResponse.json({ src });
+
+    } catch (error) {
+        console.log('[IMAGE_ERROR]', error);
+        return new NextResponse("Internal Server Error", { status: 500 });
     }
 }

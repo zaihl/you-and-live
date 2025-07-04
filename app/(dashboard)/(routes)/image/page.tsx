@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Sparkles } from "lucide-react";
 import { User } from "lucide-react";
@@ -25,7 +25,6 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
-import { generateImage } from "./action";
 import { useProModal } from "@/hooks/useProModal";
 
 const ImagePage = () => {
@@ -54,10 +53,9 @@ const ImagePage = () => {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            const src = await generateImage(values);
-            if (typeof src === "object") {
-                throw new Error("Failed to generate image");
-            }
+            const response = await axios.post("/api/image", values);
+            const { src } = response.data;
+
             setImages([...images, src]);
             setPrompts([...prompts, values.prompt]);
         } catch (error: any) {
@@ -67,6 +65,7 @@ const ImagePage = () => {
             console.error(error);
         } finally {
             router.refresh();
+            form.reset();
         }
     };
 
@@ -186,7 +185,7 @@ const ImagePage = () => {
                             <Loader />
                         </div>
                     )}
-                    {images.length === 0 && (
+                    {images.length === 0 && !isLoading && (
                         <div>
                             <Empty label="No Images generated" />
                         </div>
