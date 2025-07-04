@@ -1,39 +1,33 @@
+// /app/dashboard/image/constants.ts
 import * as z from "zod"
 
+// Updated schema to remove resolution
 export const formSchema = z.object({
     prompt: z.string().min(1, {
         message: "Image prompt is required"
     }),
-    style: z.string().min(1),
-    resolution: z.string().min(1)
+    style: z.string().min(1)
 })
 
 export const styleOptions = [
     {
-        value: "anime",
-        label: "anime",
+        value: "photograph",
+        label: "Photography",
     },
     {
-        value: "photorealism",
-        label: "photorealism",
+        value: "digital art",
+        label: "Digital Art",
     },
     {
-        value: "art",
-        label: "art",
-    },
-]
-
-export const resolutionOptions = [
-    {
-        value: "1024x1024",
-        label: "1024x1024",
+        value: "sketch",
+        label: "Sketch",
     },
     {
-        value: "1280x1280",
-        label: "1280x1280",
+        value: "oil painting",
+        label: "Painting"
     },
     {
-        value: "1536x1536",
-        label: "1536x1536",
-    },
+        value: "logo",
+        label: "Logo"
+    }
 ]
