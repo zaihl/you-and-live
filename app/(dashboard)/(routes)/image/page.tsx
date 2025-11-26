@@ -4,7 +4,12 @@ import * as z from "zod";
 import Heading from "@/components/custom/Heading";
 import { ImageIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { styleOptions, aspectRatioOptions, formSchema } from "./constants";
+import {
+    styleOptions,
+    aspectRatioOptions,
+    modelOptions,
+    formSchema,
+} from "./constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -44,6 +49,7 @@ const ImagePage = () => {
             prompt: "",
             style: "photograph",
             aspectRatio: "1:1",
+            model: "flux", // Default model
         },
     });
 
@@ -107,6 +113,40 @@ const ImagePage = () => {
                                                 {...field}
                                             />
                                         </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                name="model"
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem className="col-span-12 lg:col-span-2">
+                                        <Select
+                                            disabled={isLoading}
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                            defaultValue={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue
+                                                        defaultValue={
+                                                            field.value
+                                                        }
+                                                    />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {modelOptions.map((option) => (
+                                                    <SelectItem
+                                                        key={option.value}
+                                                        value={option.value}
+                                                    >
+                                                        {option.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </FormItem>
                                 )}
                             />
@@ -181,7 +221,7 @@ const ImagePage = () => {
                                 )}
                             />
                             <Button
-                                className="col-span-12 lg:col-span-2 w-full"
+                                className="col-span-12 w-full"
                                 disabled={isLoading}
                             >
                                 Generate
@@ -200,27 +240,36 @@ const ImagePage = () => {
                             <Empty label="No Images generated" />
                         </div>
                     )}
-                    <div className="flex flex-col-reverse gap-y-4 w-full p-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
                         {imagesAndPrompts.map((item, i) => (
                             <div
                                 key={i}
                                 className={cn(
-                                    "w-full prose max-w-none m-0 p-4",
-                                    i % 2 === 0 ? "bg-blue-100" : "bg-gray-100",
-                                    "rounded-lg p-4 border border-black/10"
+                                    "rounded-lg p-4 border border-black/10 flex flex-col justify-between",
+                                    i % 2 === 0
+                                        ? "bg-blue-100/50"
+                                        : "bg-gray-100/50"
                                 )}
                             >
-                                {i % 2 === 0 ? <User /> : <Sparkles />}
                                 {i % 2 === 0 ? (
-                                    <p>{item}</p>
+                                    <div className="mb-4">
+                                        <div className="flex items-center gap-x-2 mb-2">
+                                            <User className="w-6 h-6" />
+                                            <p className="font-semibold">
+                                                Prompt:
+                                            </p>
+                                        </div>
+                                        <p className="text-sm text-muted-foreground">
+                                            {item}
+                                        </p>
+                                    </div>
                                 ) : (
-                                    <div className="w-full p-2 flex items-center justify-center">
+                                    <div className="relative aspect-square w-full">
                                         <Image
-                                            width={512}
-                                            height={512}
+                                            fill
                                             src={item}
                                             alt="generated image"
-                                            className="object-cover shadow-lg"
+                                            className="object-cover rounded-lg"
                                         />
                                     </div>
                                 )}

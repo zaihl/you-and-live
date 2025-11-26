@@ -5,7 +5,8 @@ export const formSchema = z.object({
         message: "Image prompt is required"
     }),
     style: z.string().min(1),
-    aspectRatio: z.string().min(1)
+    aspectRatio: z.string().min(1),
+    model: z.string().min(1)
 })
 
 export const styleOptions = [
@@ -36,6 +37,14 @@ export const styleOptions = [
     {
         value: "3d render",
         label: "3D Render"
+    },
+    {
+        value: "cyberpunk",
+        label: "Cyberpunk"
+    },
+    {
+        value: "retro",
+        label: "Retro"
     }
 ]
 
@@ -60,4 +69,19 @@ export const aspectRatioOptions = [
         value: "3:4",
         label: "3:4 (Tall)",
     },
+]
+
+export const modelOptions = [
+    {
+        value: "flux",
+        label: "Flux (High Quality)",
+    },
+    {
+        value: "turbo",
+        label: "Turbo (Fast)",
+    },
+    {
+        value: "midjourney",
+        label: "Midjourney Style",
+    }
 ]

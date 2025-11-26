@@ -1,13 +1,12 @@
-import { NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
 import { checkApiLimit, increaseApiLimit } from "@/lib/apiLimit";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { prompt, style } = body;
+        const { prompt, style, aspectRatio, model = "turbo" } = body;
 
-        if (!prompt || typeof prompt !== "string") {
+        if (!prompt) {
             return new NextResponse("Prompt is required", { status: 400 });
         }
 
@@ -16,64 +15,51 @@ export async function POST(req: Request) {
             return new NextResponse("Free/Guest limit exceeded", { status: 403 });
         }
 
-        // Increase limit before call
         await increaseApiLimit();
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            return new NextResponse("API Key not configured", { status: 500 });
+        const fullPrompt = `A ${style} of ${prompt}`;
+
+        // Map aspect ratios to dimensions supported by Pollinations
+        let width = 512;
+        let height = 512;
+
+        // Default 1:1 is 1024x1024
+        if (aspectRatio === "16:9") {
+            width = 1280;
+            height = 720;
+        } else if (aspectRatio === "9:16") {
+            width = 720;
+            height = 1280;
+        } else if (aspectRatio === "4:3") {
+            width = 1024;
+            height = 768;
+        } else if (aspectRatio === "3:4") {
+            width = 768;
+            height = 1024;
         }
 
-        // 1. Initialize the new SDK Client
-        const ai = new GoogleGenAI({ apiKey });
+        // Add a random seed to ensure variety
+        const seed = Math.floor(Math.random() * 1000000000);
 
-        const fullPrompt =
-            style && typeof style === "string"
-                ? `A ${style} of ${prompt}`
-                : prompt;
+        // Construct Pollinations URL with model support
+        // https://pollinations.ai/p/[prompt]?width=[width]&height=[height]&seed=[seed]&model=[model]&nologo=true
+        const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(fullPrompt)}?width=${width}&height=${height}&seed=${seed}&model=${model}&nologo=true`;
 
-        // 2. call generateContent (Non-streaming is better for a simple HTTP response)
-        // We use the same configuration structure as your reference.
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-image",
-            config: {
-                // Explicitly ask for IMAGE. You can add 'TEXT' if you want captions.
-                responseModalities: ["IMAGE"],
-            },
-            contents: [
-                {
-                    role: "user",
-                    parts: [
-                        {
-                            text: fullPrompt,
-                        },
-                    ],
-                },
-            ],
-        });
+        const response = await fetch(imageUrl);
 
-        // 3. Extract the image data
-        // The structure follows the reference: candidates -> content -> parts -> inlineData
-        const candidate = response.candidates?.[0];
-        const part = candidate?.content?.parts?.[0];
-
-        if (!part || !part.inlineData || !part.inlineData.data) {
-            return new NextResponse("Image generation failed", { status: 500 });
+        if (!response.ok) {
+            return new NextResponse("Image generation failed", { status: response.status });
         }
 
-        // 4. Format the Base64 string for the frontend
-        const mimeType = part.inlineData.mimeType || "image/png";
-        const base64Data = part.inlineData.data;
-
-        // Create the Data URL
-        const src = `data:${mimeType};base64,${base64Data}`;
+        // Pollinations returns the binary image directly. We convert it to base64 for the frontend.
+        const buffer = await response.arrayBuffer();
+        const base64String = Buffer.from(buffer).toString('base64');
+        const src = `data:image/jpeg;base64,${base64String}`;
 
         return NextResponse.json({ src });
 
     } catch (error: any) {
-        console.error("[IMAGE_ERROR]", error);
-        return new NextResponse(error?.message || "Internal Error", {
-            status: 500,
-        });
+        console.log('[IMAGE_ERROR]', error);
+        return new NextResponse(error.message || "Internal Error", { status: 500 });
     }
 }

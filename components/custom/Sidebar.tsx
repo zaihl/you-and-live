@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import {
     Code,
     ImageIcon,
+    AudioLinesIcon,
     LayoutDashboard,
     MessageSquare,
     Settings,
@@ -23,29 +24,32 @@ const montserrat = Montserrat({
 
 const routes = [
     {
-        label: "Dashboard",
-        icon: LayoutDashboard,
-        href: "/dashboard",
-        color: "text-sky-500",
-    },
-    {
         label: "Conversation",
         icon: MessageSquare,
+        color: "text-indigo-600",
+        bgColor: "bg-indigo-600/10",
         href: "/conversation",
-        color: "text-violet-500",
     },
     {
         label: "Image Generation",
         icon: ImageIcon,
         href: "/image",
-        color: "text-pink-700",
+        color: "text-rose-500",
+        bgColor: "bg-rose-500/10",
     },
-    // Video and Music removed as requested
+    {
+        label: "Audio Generation",
+        icon: AudioLinesIcon,
+        href: "/audio",
+        color: "text-cyan-600",
+        bgColor: "bg-cyan-600/10",
+    },
     {
         label: "Code Generation",
         icon: Code,
         href: "/code",
-        color: "text-green-700",
+        color: "text-emerald-600",
+        bgColor: "bg-emerald-600/10",
     },
     {
         label: "Settings",

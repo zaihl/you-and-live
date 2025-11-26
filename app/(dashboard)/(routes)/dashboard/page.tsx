@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Code, ImageIcon, MessageSquare } from "lucide-react";
+import { ArrowRight, Code, ImageIcon, MessageSquare, AudioLinesIcon } from "lucide-react";
 import Link from "next/link";
 
 const tools = [
@@ -18,7 +18,13 @@ const tools = [
         color: "text-pink-700",
         bgColor: "bg-pink-700/10",
     },
-    // Music and Video removed
+    {
+        label: "Audio Generation",
+        icon: AudioLinesIcon,
+        href: "/audio",
+        color: "text-emerald-500",
+        bgColor: "bg-emerald-500/10",
+    },
     {
         label: "Code Generation",
         icon: Code,
