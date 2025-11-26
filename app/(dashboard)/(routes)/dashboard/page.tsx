@@ -1,6 +1,20 @@
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Code, ImageIcon, MessageSquare, AudioLinesIcon } from "lucide-react";
+import {
+    ArrowRight,
+    Code,
+    ImageIcon,
+    MessageSquare,
+    Music,
+    VideoIcon,
+    FileText,
+    Languages,
+    HelpCircle,
+    Smile,
+    Mail,
+    Terminal,
+    Utensils,
+} from "lucide-react";
 import Link from "next/link";
 
 const tools = [
@@ -14,23 +28,80 @@ const tools = [
     {
         label: "Image Generation",
         icon: ImageIcon,
-        href: "/image",
         color: "text-pink-700",
         bgColor: "bg-pink-700/10",
+        href: "/image",
+    },
+    {
+        label: "Video Generation",
+        icon: VideoIcon,
+        color: "text-orange-700",
+        bgColor: "bg-orange-700/10",
+        href: "/video",
     },
     {
         label: "Audio Generation",
-        icon: AudioLinesIcon,
-        href: "/audio",
+        icon: Music,
         color: "text-emerald-500",
         bgColor: "bg-emerald-500/10",
+        href: "/music",
     },
     {
         label: "Code Generation",
         icon: Code,
-        href: "/code",
         color: "text-green-700",
         bgColor: "bg-green-700/10",
+        href: "/code",
+    },
+    {
+        label: "Summarizer",
+        icon: FileText,
+        color: "text-cyan-600",
+        bgColor: "bg-cyan-600/10",
+        href: "/summary",
+    },
+    {
+        label: "Translator",
+        icon: Languages,
+        color: "text-blue-600",
+        bgColor: "bg-blue-600/10",
+        href: "/translate",
+    },
+    // New
+    {
+        label: "Quiz Generator",
+        icon: HelpCircle,
+        color: "text-yellow-500",
+        bgColor: "bg-yellow-500/10",
+        href: "/quiz",
+    },
+    {
+        label: "Bio Generator",
+        icon: Smile,
+        color: "text-pink-500",
+        bgColor: "bg-pink-500/10",
+        href: "/bio",
+    },
+    {
+        label: "Email Drafter",
+        icon: Mail,
+        color: "text-indigo-500",
+        bgColor: "bg-indigo-500/10",
+        href: "/email",
+    },
+    {
+        label: "Regex Gen",
+        icon: Terminal,
+        color: "text-slate-700",
+        bgColor: "bg-slate-700/10",
+        href: "/regex",
+    },
+    {
+        label: "Recipe Gen",
+        icon: Utensils,
+        color: "text-orange-500",
+        bgColor: "bg-orange-500/10",
+        href: "/recipe",
     },
 ];
 
@@ -45,14 +116,14 @@ const Dashboard = () => {
                     Chat with your favorite AI
                 </p>
             </div>
-            <div className="px-4 md:px-20 lg:px-32 space-y-4">
+            <div className="px-4 md:px-20 lg:px-32 space-y-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tools.map((tool) => (
                     <Link
                         href={tool.href}
                         key={tool.href}
-                        className="m-2 border-black/5 hover:shadow-md transition cursor-pointer"
+                        className="m-2 border-black/5 hover:shadow-md transition cursor-pointer block h-full"
                     >
-                        <Card className="p-4 w-full  flex items-center justify-between">
+                        <Card className="p-4 w-full flex items-center justify-between h-full">
                             <div className="flex times-center space-x-4">
                                 <div
                                     className={cn(

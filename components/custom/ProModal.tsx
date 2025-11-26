@@ -9,7 +9,16 @@ import {
     DialogDescription,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { Check, Code, ImageIcon, MessageSquare } from "lucide-react";
+import {
+    Check,
+    Code,
+    ImageIcon,
+    MessageSquare,
+    AudioLinesIcon,
+    VideoIcon,
+    FileText,
+    Languages,
+} from "lucide-react";
 import { Card } from "../ui/card";
 import { cn } from "@/lib/utils";
 
@@ -28,13 +37,40 @@ const tools = [
         color: "text-pink-700",
         bgColor: "bg-pink-700/10",
     },
-    // Removed Video/Music
+    {
+        label: "Video Generation",
+        icon: VideoIcon,
+        href: "/video",
+        color: "text-orange-700",
+        bgColor: "bg-orange-700/10",
+    },
+    {
+        label: "Audio Generation",
+        icon: AudioLinesIcon,
+        href: "/audio",
+        color: "text-emerald-500",
+        bgColor: "bg-emerald-500/10",
+    },
     {
         label: "Code Generation",
         icon: Code,
         href: "/code",
         color: "text-green-700",
         bgColor: "bg-green-700/10",
+    },
+    {
+        label: "Summarizer",
+        icon: FileText,
+        href: "/summary",
+        color: "text-cyan-600",
+        bgColor: "bg-cyan-600/10",
+    },
+    {
+        label: "Translator",
+        icon: Languages,
+        href: "/translate",
+        color: "text-blue-600",
+        bgColor: "bg-blue-600/10",
     },
 ];
 

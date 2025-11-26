@@ -16,8 +16,11 @@ const LandingHero = () => {
                             strings: [
                                 "Chatbot",
                                 "Photo Generation",
-                                // Removed Music/Video strings
+                                "Video Generation",
+                                "Audio Generation",
                                 "Code Generation",
+                                "Text Summarizer",
+                                "Translator",
                             ],
                             autoStart: true,
                             loop: true,
@@ -30,7 +33,6 @@ const LandingHero = () => {
             </div>
             <div>
                 <Link href={isSignedIn ? "/dashboard" : "/dashboard"}>
-                    {/* Changed redirect to dashboard regardless of signin, since guests are allowed */}
                     <Button
                         variant={"premium"}
                         className="md:text-lg p-4 md:p-6 rounded-full"

@@ -8,10 +8,18 @@ import { cn } from "@/lib/utils";
 import {
     Code,
     ImageIcon,
-    AudioLinesIcon,
     LayoutDashboard,
     MessageSquare,
+    Music,
     Settings,
+    VideoIcon,
+    FileText,
+    Languages,
+    HelpCircle, // Quiz
+    Smile, // Bio
+    Mail, // Email
+    Terminal, // Regex
+    Utensils, // Recipe
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -24,39 +32,86 @@ const montserrat = Montserrat({
 
 const routes = [
     {
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        href: "/dashboard",
+        color: "text-sky-500",
+    },
+    {
         label: "Conversation",
         icon: MessageSquare,
-        color: "text-indigo-600",
-        bgColor: "bg-indigo-600/10",
         href: "/conversation",
+        color: "text-violet-500",
     },
     {
         label: "Image Generation",
         icon: ImageIcon,
         href: "/image",
-        color: "text-rose-500",
-        bgColor: "bg-rose-500/10",
+        color: "text-pink-700",
+    },
+    {
+        label: "Video Generation",
+        icon: VideoIcon,
+        href: "/video",
+        color: "text-orange-700",
     },
     {
         label: "Audio Generation",
-        icon: AudioLinesIcon,
-        href: "/audio",
-        color: "text-cyan-600",
-        bgColor: "bg-cyan-600/10",
-    },
+        icon: Music,
+        href: "/music",
+        color: "text-emerald-500",
+    }, // Kept /music route but relabeled
     {
         label: "Code Generation",
         icon: Code,
         href: "/code",
-        color: "text-emerald-600",
-        bgColor: "bg-emerald-600/10",
+        color: "text-green-700",
     },
     {
-        label: "Settings",
-        icon: Settings,
-        href: "/settings",
-        color: "",
+        label: "Summarizer",
+        icon: FileText,
+        href: "/summary",
+        color: "text-cyan-600",
     },
+    {
+        label: "Translator",
+        icon: Languages,
+        href: "/translate",
+        color: "text-blue-600",
+    },
+    // New Routes
+    {
+        label: "Quiz Generator",
+        icon: HelpCircle,
+        href: "/quiz",
+        color: "text-yellow-500",
+    },
+    {
+        label: "Bio Generator",
+        icon: Smile,
+        href: "/bio",
+        color: "text-pink-500",
+    },
+    {
+        label: "Email Drafter",
+        icon: Mail,
+        href: "/email",
+        color: "text-indigo-500",
+    },
+    {
+        label: "Regex Gen",
+        icon: Terminal,
+        href: "/regex",
+        color: "text-slate-700",
+    },
+    {
+        label: "Recipe Gen",
+        icon: Utensils,
+        href: "/recipe",
+        color: "text-orange-500",
+    },
+
+    { label: "Settings", icon: Settings, href: "/settings", color: "" },
 ];
 
 const Sidebar = ({ apiLimitCount = 0 }: { apiLimitCount: number }) => {

@@ -34,6 +34,6 @@ export async function POST(req: Request) {
 
         return NextResponse.json(output, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error: `[music error]: ${error}` })
+        return NextResponse.json({ error: `[audio error]: ${error}` })
     }
 }
