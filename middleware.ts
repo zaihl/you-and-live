@@ -1,20 +1,16 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
+// Define routes that strictly require authentication
+// We EXCLUDE generation routes here to allow guests
 const isProtectedRoute = createRouteMatcher([
-    '/dashboard(.*)',
     '/settings(.*)',
-    '/code(.*)',
-    '/conversation(.*)',
-    '/music(.*)',
-    '/video(.*)',
-    '/image(.*)',
-    '/api(.*)',
+    // '/dashboard' is technically public now for guests
 ]);
 
 export default clerkMiddleware((auth, req) => {
-    if (!auth().userId && isProtectedRoute(req)) {
-
-        return auth().redirectToSignIn();
+    // Only protect strict routes, let the app logic handle limits for others
+    if (isProtectedRoute(req)) {
+        auth().protect();
     }
 });
 

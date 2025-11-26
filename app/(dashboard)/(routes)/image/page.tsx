@@ -1,22 +1,18 @@
-// /app/dashboard/image/page.tsx
 "use client";
 
 import * as z from "zod";
 import Heading from "@/components/custom/Heading";
 import { ImageIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
-// Removed resolutionOptions from import
-import { styleOptions, formSchema } from "./constants";
+import { styleOptions, aspectRatioOptions, formSchema } from "./constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Sparkles } from "lucide-react";
-import { User } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 import { Empty } from "./empty";
 import Loader from "@/components/custom/Loader";
 import {
@@ -44,10 +40,10 @@ const ImagePage = () => {
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        // Updated default values to remove resolution
         defaultValues: {
             prompt: "",
             style: "photograph",
+            aspectRatio: "1:1",
         },
     });
 
@@ -55,15 +51,27 @@ const ImagePage = () => {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            const response = await axios.post("/api/image", values);
-            const { src } = response.data;
+            const response = await fetch("/api/image", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(values),
+            });
+
+            if (!response.ok) {
+                if (response.status === 403) {
+                    proModal.onOpen();
+                }
+                throw new Error("Image generation failed");
+            }
+
+            const data = await response.json();
+            const { src } = data;
 
             setImages([...images, src]);
             setPrompts([...prompts, values.prompt]);
         } catch (error: any) {
-            if (error?.response?.status === 403) {
-                proModal.onOpen();
-            }
             console.error(error);
         } finally {
             router.refresh();
@@ -85,14 +93,12 @@ const ImagePage = () => {
                     <Form {...form}>
                         <form
                             onSubmit={form.handleSubmit(onSubmit)}
-                            // Adjusted grid layout
                             className="rounded-lg border w-full p-4 px-3 md:px-6 focus-within:shadow-sm grid grid-cols-12 gap-2"
                         >
                             <FormField
                                 name="prompt"
                                 render={({ field }) => (
-                                    // Adjusted column span
-                                    <FormItem className="col-span-12 lg:col-span-8">
+                                    <FormItem className="col-span-12 lg:col-span-6">
                                         <FormControl className="m-0 p-0">
                                             <Input
                                                 className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
@@ -138,7 +144,42 @@ const ImagePage = () => {
                                     </FormItem>
                                 )}
                             />
-                            {/* The resolution dropdown has been removed */}
+                            <FormField
+                                name="aspectRatio"
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem className="col-span-12 lg:col-span-2">
+                                        <Select
+                                            disabled={isLoading}
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                            defaultValue={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue
+                                                        defaultValue={
+                                                            field.value
+                                                        }
+                                                    />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {aspectRatioOptions.map(
+                                                    (option) => (
+                                                        <SelectItem
+                                                            key={option.value}
+                                                            value={option.value}
+                                                        >
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    )
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormItem>
+                                )}
+                            />
                             <Button
                                 className="col-span-12 lg:col-span-2 w-full"
                                 disabled={isLoading}

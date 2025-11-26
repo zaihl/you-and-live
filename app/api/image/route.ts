@@ -1,75 +1,79 @@
-// app/api/image/route.ts
-import { checkApiLimit, increaseApiLimit } from "@/lib/apiLimit";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { GoogleGenAI, Modality } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
+import { checkApiLimit, increaseApiLimit } from "@/lib/apiLimit";
 
 export async function POST(req: Request) {
     try {
-        const { userId } = auth();
-        if (!userId) {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
-
-        const ai = new GoogleGenAI({apiKey: process.env.GEMINI_API_KEY!});
-
         const body = await req.json();
-        // The 'resolution' field is no longer used with this model
         const { prompt, style } = body;
 
-        if (!prompt) {
+        if (!prompt || typeof prompt !== "string") {
             return new NextResponse("Prompt is required", { status: 400 });
         }
 
-        const freeTrial = await checkApiLimit();
-
-        if (!freeTrial) {
-            return new NextResponse("Free trial limit exceeded", { status: 403 });
+        const canGenerate = await checkApiLimit();
+        if (!canGenerate) {
+            return new NextResponse("Free/Guest limit exceeded", { status: 403 });
         }
 
+        // Increase limit before call
         await increaseApiLimit();
 
-        // Combine the user's prompt with the selected style
-        const fullPrompt = `A ${style} of ${prompt}`;
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return new NextResponse("API Key not configured", { status: 500 });
+        }
 
-        // Generate content using the Gemini model for image generation
+        // 1. Initialize the new SDK Client
+        const ai = new GoogleGenAI({ apiKey });
+
+        const fullPrompt =
+            style && typeof style === "string"
+                ? `A ${style} of ${prompt}`
+                : prompt;
+
+        // 2. call generateContent (Non-streaming is better for a simple HTTP response)
+        // We use the same configuration structure as your reference.
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-image", // Supported model for conversational image generation
-            contents: [{
-                role: "user",
-                parts: [{ text: fullPrompt }]
-            }],
+            model: "gemini-2.5-flash-image",
             config: {
-                // You must specify IMAGE as a response modality
-                responseModalities: [Modality.TEXT, Modality.IMAGE],
+                // Explicitly ask for IMAGE. You can add 'TEXT' if you want captions.
+                responseModalities: ["IMAGE"],
             },
+            contents: [
+                {
+                    role: "user",
+                    parts: [
+                        {
+                            text: fullPrompt,
+                        },
+                    ],
+                },
+            ],
         });
 
-        // Find the first image part in the response
-        let src = "";
-        if (
-            response.candidates &&
-            response.candidates[0] &&
-            response.candidates[0].content &&
-            Array.isArray(response.candidates[0].content.parts)
-        ) {
-            for (const part of response.candidates[0].content.parts) {
-                if (part.inlineData) { // Check for image data
-                    const imageData = part.inlineData.data; // Extract base64 data
-                    src = `data:image/png;base64,${imageData}`;
-                    break; // Stop after finding the first image
-                }
-            }
+        // 3. Extract the image data
+        // The structure follows the reference: candidates -> content -> parts -> inlineData
+        const candidate = response.candidates?.[0];
+        const part = candidate?.content?.parts?.[0];
+
+        if (!part || !part.inlineData || !part.inlineData.data) {
+            return new NextResponse("Image generation failed", { status: 500 });
         }
 
-        if (!src) {
-            return new NextResponse("Image could not be generated.", { status: 500 });
-        }
+        // 4. Format the Base64 string for the frontend
+        const mimeType = part.inlineData.mimeType || "image/png";
+        const base64Data = part.inlineData.data;
+
+        // Create the Data URL
+        const src = `data:${mimeType};base64,${base64Data}`;
 
         return NextResponse.json({ src });
 
-    } catch (error) {
-        console.log('[IMAGE_ERROR]', error);
-        return new NextResponse("Internal Server Error", { status: 500 });
+    } catch (error: any) {
+        console.error("[IMAGE_ERROR]", error);
+        return new NextResponse(error?.message || "Internal Error", {
+            status: 500,
+        });
     }
 }

@@ -9,12 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Sparkles } from "lucide-react";
-import { User } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 import { Empty } from "./empty";
 import Loader from "@/components/custom/Loader";
 import ReactMarkdown from "react-markdown";
@@ -29,6 +27,14 @@ const ConversationPage = () => {
     const proModal = useProModal();
     const router = useRouter();
     const [messages, setMessages] = useState<geminiChat[]>([]);
+
+    // Guest Cookie Logic
+    useEffect(() => {
+        if (document.cookie.indexOf("guest_id") === -1) {
+            const randomId = Math.random().toString(36).substring(2, 15);
+            document.cookie = `guest_id=${randomId}; path=/; max-age=31536000`;
+        }
+    }, []);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -45,24 +51,35 @@ const ConversationPage = () => {
                 role: "user",
                 parts: [{ text: values.prompt }],
             };
-
             const newMessages = [...messages, userMessage];
 
-            const response = await axios.post("/api/conversation", {
-                messages: newMessages,
+            const response = await fetch("/api/conversation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ messages: newMessages }),
             });
-            const modelResponse: geminiChat = {
-                role: "model",
-                parts: [{ text: response.data.text }],
-            };
 
-            setMessages([...newMessages, modelResponse]);
+            if (!response.ok) {
+                if (response.status === 403) {
+                    proModal.onOpen();
+                } else {
+                    throw new Error("Something went wrong");
+                }
+                return;
+            }
+
+            const data = await response.json();
+
+            setMessages((current) => [
+                ...current,
+                userMessage,
+                { role: "model", parts: [{ text: data.text }] },
+            ]);
 
             form.reset();
         } catch (error: any) {
-            if (error?.response?.status === 403) {
-                proModal.onOpen();
-            }
             console.error(error);
         } finally {
             router.refresh();
@@ -115,23 +132,20 @@ const ConversationPage = () => {
                             <Loader />
                         </div>
                     )}
-                    {messages.length === 0 && (
+                    {messages.length === 0 && !isLoading && (
                         <div>
                             <Empty label="No conversations started" />
                         </div>
                     )}
-                    <div className="p-2 flex flex-col-reverse gap-y-4 w-full">
+                    <div className="p-2 flex flex-col gap-y-4 w-full">
                         {messages.map((message, index) => (
                             <div
                                 key={index}
                                 className={cn(
+                                    "rounded-lg p-4 border border-black/10",
                                     message.role === "user"
                                         ? "bg-blue-100"
-                                        : "bg-gray-100",
-                                    "rounded-lg p-4 border border-black/10",
-                                    index === messages.length - 1
-                                        ? "snap-end"
-                                        : ""
+                                        : "bg-gray-100"
                                 )}
                             >
                                 {message.role === "user" ? (
