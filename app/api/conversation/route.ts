@@ -36,7 +36,7 @@ export async function POST(req: Request) {
         const currentPrompt = currentMessageParts[0].text;
 
         const chat = ai.chats.create({
-            model: "gemini-2.5-flash-preview-05-20", // Or a specific code generation tuned model if available and preferred
+            model: "gemini-2.5-flash", // Or a specific code generation tuned model if available and preferred
             history: history,
             config: {
                 maxOutputTokens: 10000,
