@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
         // Generate content using the Gemini model for image generation
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash-preview-image-generation", // Supported model for conversational image generation
+            model: "gemini-2.5-flash-image", // Supported model for conversational image generation
             contents: [{
                 role: "user",
                 parts: [{ text: fullPrompt }]
