@@ -58,9 +58,9 @@ const routes = [
     {
         label: "Audio Generation",
         icon: Music,
-        href: "/music",
+        href: "/audio",
         color: "text-emerald-500",
-    }, // Kept /music route but relabeled
+    }, // Kept /audio route but relabeled
     {
         label: "Code Generation",
         icon: Code,
